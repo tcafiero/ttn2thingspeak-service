@@ -1,0 +1,30 @@
+{
+  "name": "ttn2thingspeak-service",
+  "version": "1.0.0",
+  "description": "Gateway service Subscribing to an LoraWan TTN Server for an application/Device, reading and decodingsome fields from the payload_raw  and Publishing it on a ThingSpeak.",
+  "main": "ttn2thingspeak-service.js",
+  "dependencies": {
+    "dms2dec": "^1.1.0",
+    "easy-pg": "^2.2.0",
+    "events": "^1.1.1",
+    "mqtt": "^2.18.3",
+    "pg": "^7.4.1",
+    "postgresql-easy": "^1.2.4",
+    "thingspeakclient": "^0.4.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tcafiero/ttn2thingspeak-service.git"
+  },
+  "keywords": [],
+  "author": "Toni Cafiero",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tcafiero/ttn2thingspeak-service/issues"
+  },
+  "homepage": "https://github.com/tcafiero/ttn2thingspeak-service#readme"
+}
