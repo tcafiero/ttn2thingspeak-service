@@ -6,33 +6,35 @@ var client = new ThingSpeakClient();
 var yourWriteKey = '9W0Y5T5P2ICBF1HX';
 var channelID = 168044;
 
-client.attachChannel(channelID, { writeKey:yourWriteKey}, callBackThingspeak);
+client.attachChannel(channelID, {
+  writeKey: yourWriteKey
+}, callBackThingspeak);
 
 
 
 
 
-function callBackThingspeak(err, resp)
-{
-    if (!err && resp > 0) {
-        console.log('Successfully. response was: ' + resp);
-    }
-    else {
-      console.log(err);
-    }
-
+function callBackThingspeak(err, resp) {
+  if (!err && resp > 0) {
+    console.log('Successfully. response was: ' + resp);
+  } else {
+    console.log(err);
   }
 
-MQTTclients.ttn_client.on("message", function(topic, msg) {
+}
+
+MQTTclients.ttn_client.on("message", function (topic, msg) {
   try {
     //console.log(msg.toString());
     msg = JSON.parse(msg);
     switch (topic) {
-        //case "iotwapplication002/devices/temperature-and-humidity-002/events/activations":
+      //case "iotwapplication002/devices/temperature-and-humidity-002/events/activations":
 
-            case String(topic.match(/^iotwapplication002\/devices\/temperature-and-humidity-...\/events\/activations/)):
+      case String(topic.match(/^iotwapplication002\/devices\/temperature-and-humidity-...\/events\/activations/)):
         // LoRa user data is on port one
-        var payloadObj = { port: 1 };
+        var payloadObj = {
+          port: 1
+        };
         // array for the binary payload
         var array = new Uint8Array(8);
         // get the local system time
@@ -60,8 +62,9 @@ MQTTclients.ttn_client.on("message", function(topic, msg) {
         // the MQTT node will send to the topic we specify
         msg.topic = dwnTopicStr;
         break;
-      //case "iotwapplication002/devices/temperature-and-humidity-002/up":
-      case String(topic.match(/^iotwapplication002\/devices\/temperature-and-humidity-...\/up/)):
+        //case "iotwapplication002/devices/temperature-and-humidity-002/up":
+//        case String(topic.match(/^iotwapplication002\/devices\/temperature-and-humidity-...\/up/)):
+        case String(topic.match(/^iotwapplication002\/devices\/temperature-and-humidity-001\/up/)):
         // the raw payload is a base64 encoded version of the binary data sent by the RS1xx sensor
         if (msg.payload_raw) {
           var bArray = Buffer.from(msg.payload_raw, "base64");
@@ -75,16 +78,23 @@ MQTTclients.ttn_client.on("message", function(topic, msg) {
             case 1: // handle the single temp and humidity reading
               msg.humidity = bArray[idx++] / 100 + bArray[idx++];
               msg.temp = convertTempUnits(bArray[idx++], bArray[idx++]);
+              var name = topic.match(/^iotwapplication002\/devices\/(.*)\/up/);
+              msg.name = name[1];
               msg.batCapacity = bArray[idx++];
-              client.updateChannel(channelID, {field1: msg.temp, field2: msg.humidity, field4: msg.batCapacity}, function(err, resp) {
+              client.updateChannel(channelID, {
+                field1: msg.temp,
+                field2: msg.humidity,
+                field3: msg.batCapacity
+                //field4: msg.name
+
+              }, function (err, resp) {
                 if (!err && resp > 0) {
-                    console.log('update successfully. Entry number was: ' + resp);
-                }
-                else {
+                  console.log('update successfully. Entry number was: ' + resp);
+                } else {
                   console.log(err);
                 }
-            });
-            
+              });
+
               break;
             case 2: // handle the aggregate temp and humidity reading
               //handleMsgType_2(msg);
